@@ -156,6 +156,11 @@ def run_playbook():
             else:
                   extra_vars[constant_object['arg_name']] = eval(constant_object['value']['helper_function'] + '("' + request.args['host'] + '")')
 
+    # loading the sensitive data in the ansible vault. It's a json file encrypted with ansible vault. Json is a subset of yaml.
+    sensitive_data = bridge.load_vault_yaml(os.path.sep.join([loader.get_config_directory(), 'vault.json.aes']), ansible_config['vault_password'])
+    if not 'sudo_password' in sensitive_data:
+        return jsonify(error='File vault.json.aes does not contain field "sudo_password"')
+    become_pass = sensitive_data['sudo_password']
 
     # work out the values to call tachyon with
     playbook_path = os.path.sep.join([ansible_config['ntdr_pas_path'], 'playbooks', playbook_schema['yaml']])
@@ -173,7 +178,7 @@ def run_playbook():
     if request.headers.get('accept') == 'text/event-stream':
         def events():
             # yield events as they arrive
-            for event in bridge.run_playbook(playbook_path, inventory_path, [ limit ], extra_vars):
+            for event in bridge.run_playbook(playbook_path, inventory_path, [ limit ], become_pass, extra_vars):
                 yield 'data: ' + json.dumps(event) + '\n\n'
         # give Flask the event data generator
         return Response(events(), content_type='text/event-stream')
@@ -223,4 +228,4 @@ def get_filetree():
 
 
 if __name__ == '__main__':
-    app.run(server_config['host'], server_config['port'], server_config['threading'])
+    app.run(server_config['host'], server_config['port'], server_config['threading'], use_reloader=False)

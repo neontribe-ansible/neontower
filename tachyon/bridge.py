@@ -12,6 +12,7 @@ aren't we clever.
 import os
 from threading import Thread
 
+from ansible.utils import parse_yaml_from_file
 from ansible.runner import Runner
 from ansible.playbook import PlayBook
 from ansible.inventory import Inventory
@@ -41,7 +42,7 @@ def _run_yielding_events(ansible_object):
             break
 
 
-def run_playbook(playbook_path, inventory_path, limits, extra_vars):
+def run_playbook(playbook_path, inventory_path, limits, sudo_password, extra_vars):
     '''Instantiate and run a PlayBook object with Ansible's API, yielding
     events in the process.
 
@@ -52,13 +53,15 @@ def run_playbook(playbook_path, inventory_path, limits, extra_vars):
     * playbook_path     str     The path of the YML PlayBook file.
     * inventory_path    str     The path of the inventory file.
     * limits            str[]   The servers to limit the tasks to (can be None to do all servers).
+    * sudo_password     str     The password to use if assuming root priveleges. TODO: make optional
     * extra_vars        dict    String keys and values of variables to pass into the PlayBook.
 
     Example Usage:
-      event_generator = tachyon.run_playbook(
+      event_generator = bridge.run_playbook(
           '/home/harryd/ntdr-pas/playbooks/pull-full-copy.yml',
           '/home/harryd/ntdr-pas/playbooks/inventory/cottage-servers',
           ['zz_live'],
+          'hunter2',
           { 'source': '/var/www', 'local': '/var/tmp' }
       )
 
@@ -81,6 +84,7 @@ def run_playbook(playbook_path, inventory_path, limits, extra_vars):
         playbook            =   playbook_path,
         host_list           =   inventory_path,
         subset              =   subset,
+        become_pass         =   sudo_password,
         extra_vars          =   extra_vars,
         callbacks           =   callbacks_object,
         runner_callbacks    =   callbacks_object,
@@ -92,7 +96,7 @@ def run_playbook(playbook_path, inventory_path, limits, extra_vars):
         yield callback_data
 
 
-def run_task(module_path, inventory_path, limits, extra_vars):
+def run_task(module_path, inventory_path, limits, sudo_password, extra_vars):
     '''Instantiate and run a Runner object with Ansible's API (effectively
     running a task), yielding events in the process.
 
@@ -100,16 +104,18 @@ def run_task(module_path, inventory_path, limits, extra_vars):
     * module_path       str     The path of the .py task file.
     * inventory_path    str     The path of the inventory file.
     * limits            str[]   The servers to limit the task to (can be None to do all servers)
+    * sudo_password     str     The password to use if assuming root priveleges. TODO: make optional
     * extra_vars        dict    String keys and values of variables to pass into the task.
 
     Yields:
     dict    The event represented in dict form.
 
     Example Usage:
-      event_generator = tachyon.run_task(
+      event_generator = bridge.run_task(
           '/home/harryd/ntdr-pas/playbooks/library/ntdr_get_filetree.py',
           '/home/harryd/ntdr-pas/playbooks/inventory/cottage-servers',
           ['zz_live'],
+          'hunter2',
           { 'path': '/var/www' }
       )
 
@@ -130,12 +136,15 @@ def run_task(module_path, inventory_path, limits, extra_vars):
 
     subset = ':'.join(limits) if limits != None else None
 
-    #
+    # see https://github.com/ansible/ansible/blob/74afd2438754a2c94e37c3bfe2804c43b7f6c7f3/lib/ansible/runner/__init__.py#L109
+    # for other parameters and info not made obvious by the code. Unfortunately,
+    # as you probably know, Ansible does not have much documentation on this.
     runner = Runner(
         module_name         =   module_name,
         module_path         =   module_parent_directory,
         inventory           =   Inventory(inventory_path),
         subset              =   subset,
+        become_pass         =   sudo_password,
         module_args         =   extra_vars,
         callbacks           =   callbacks_object,
         forks               =   1 # increasing this has lead to problems with storing events
@@ -156,7 +165,7 @@ def get_host_names(inventory_path):
     str[]   Returns a list of host names as strings. Ignores group names.
 
     Example Usage:
-      hosts = tachyon.get_host_names('/home/harryd/ntdr-pas/playbooks/inventory/cottage-servers')
+      hosts = bridge.get_host_names('/home/harryd/ntdr-pas/playbooks/inventory/cottage-servers')
     '''
     inventory_parser = InventoryParser(filename=inventory_path)
     hosts = []
@@ -165,12 +174,42 @@ def get_host_names(inventory_path):
     return hosts
 
 def get_host_passwords(inventory_path):
-    hosts = InventoryParser(filename=inventory_path).hosts
+    '''Read the passwords of the servers from an Inventory file with Ansible's API.
 
-    passwords ={}
+    NOTE: the passwords described are the passwords given by the "mysql_root_pw" field in the
+          inventory file.
+ 
+    Parameters:
+    * inventory_path    str     The path of the inventory file to read hosts
+                                from.
+
+    Returns:
+    dict    Returns a dictionary of host names (keys) and passwords (values)
+
+    Example Usage:
+      passwords = bridge.get_host_passwords('/home/harryd/ntdr-pas/playbooks/inventory/cottage-servers')
+    '''
+    hosts = InventoryParser(filename=inventory_path).hosts
+    passwords = {}
     for host in hosts:
         if 'mysql_root_pw' in hosts[host].vars:
             passwords[host] = hosts[host].vars['mysql_root_pw']
         else:
-            passwords[host] = 'Remote root password is not in the ansible inventory file'
+            passwords[host] = 'Remote root password is not in the ansible inventory file' # TODO: proper error reporting
     return passwords
+
+def load_vault_yaml(path, password):
+    '''Load a YAML file encrypted with Ansible vault at the given path with the given vault password.
+
+    Parameters:
+    * path            str     The path of the encrypted YAML file to read from.
+    * password        str     The password to use when decrypting the file.
+
+    Returns:
+    dict    Returns a dictionary representing the parsed YAML from the file.
+
+    Example Usage:
+      secret_config = bridge.load_vault_yaml('/home/harryd/neontower/config/super_secret.json.aes', 'hunter2')
+    '''
+    return parse_yaml_from_file(path, password)
+
