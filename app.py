@@ -191,11 +191,17 @@ def run_playbook():
 
 def fetch_filetree():
     # runs the get filetree task for each server
+    sensitive_data = bridge.load_vault_yaml(os.path.sep.join([loader.get_config_directory(), 'vault.json.aes']), ansible_config['vault_password'])
     server_codes = bridge.get_host_names(ansible_config['inventory_path'])
+    if not 'sudo_password' in sensitive_data:
+        return jsonify(error='File vault.json.aes does not contain field "sudo_password"')
+    become_pass = sensitive_data['sudo_password']
+
     event_generator = bridge.run_task(
         os.path.sep.join([ ansible_config['ntdr_pas_path'], 'playbooks', 'library', 'ntdr_get_filetree.py' ]),
         ansible_config['inventory_path'],
         server_codes,
+	become_pass,	
         { 'path': ansible_config['remote_site_root'] }
     )
 
