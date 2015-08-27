@@ -120,6 +120,7 @@ div.log .message:last-child .part
 div.log .message .part:last-child
 {
   border-right: 0;
+  word-break: break-all;
 }
 
 button
