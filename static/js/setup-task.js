@@ -12,6 +12,8 @@
       var url = buildUrl('/run_playbook', values);
       var source = new EventSource(url);
 
+      logger.clear();
+
       source.addEventListener('open', function (event) {
         logger.log([new Date().toLocaleTimeString(), 'Connected']);
       });

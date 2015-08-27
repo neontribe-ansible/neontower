@@ -34,6 +34,10 @@
     }
   }
 
+  Logger.prototype.clear = function () {
+    this.logElement.innerHTML = '';
+  }
+
   function isScrolledToBottom() {
     // the y-coordinate of the lowest pixel shown from the document on screen
     // at present
