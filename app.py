@@ -144,17 +144,13 @@ def run_playbook():
 
     # add PlayBook's constants
     for constant_object in playbook_schema['constants']:
-        # if the constant is just a string add it to the extra vars as is.
-        if type(constant_object['value']) is str:
-            extra_vars[constant_object['arg_name']] = constant_object['value']
-
         # if the constant is a dictionary it indicates that a helper function is going
         # to be used, therefore extra work is needed
         if type(constant_object['value']) is dict:
-            if not 'host' in request.args:
-                return jsonify(error='The \'host\' parameter is required'), HTTP_UNPROCESSABLE_ENTITY
-            else:
-                  extra_vars[constant_object['arg_name']] = eval(constant_object['value']['helper_function'] + '("' + request.args['host'] + '")')
+            # TODO: kill eval with fire
+            extra_vars[constant_object['arg_name']] = eval(constant_object['value']['helper_function'] + '("' + request.args['host'] + '")')
+        else:
+            extra_vars[constant_object['arg_name']] = constant_object['value']
 
     # loading the sensitive data in the ansible vault. It's a json file encrypted with ansible vault. Json is a subset of yaml.
     sensitive_data = bridge.load_vault_yaml(os.path.sep.join([loader.get_config_directory(), 'vault.json.aes']), ansible_config['vault_password'])
@@ -201,7 +197,7 @@ def fetch_filetree():
         os.path.sep.join([ ansible_config['ntdr_pas_path'], 'playbooks', 'library', 'ntdr_get_filetree.py' ]),
         ansible_config['inventory_path'],
         server_codes,
-	become_pass,	
+	become_pass,
         { 'path': ansible_config['remote_site_root'] }
     )
 
