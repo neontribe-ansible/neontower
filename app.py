@@ -174,7 +174,7 @@ def run_playbook():
     if request.headers.get('accept') == 'text/event-stream':
         def events():
             # yield events as they arrive
-            for event in bridge.run_playbook(playbook_path, inventory_path, [ limit ], become_pass, extra_vars):
+            for event in bridge.run_playbook(playbook_path, inventory_path, [ limit ],become_pass, extra_vars):
                 yield 'data: ' + json.dumps(event) + '\n\n'
         # give Flask the event data generator
         return Response(events(), content_type='text/event-stream')

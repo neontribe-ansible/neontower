@@ -84,7 +84,7 @@ def run_playbook(playbook_path, inventory_path, limits, sudo_password, extra_var
         playbook            =   playbook_path,
         host_list           =   inventory_path,
         subset              =   subset,
-        become_pass         =   sudo_password,
+	become_pass         =   sudo_password,
         extra_vars          =   extra_vars,
         callbacks           =   callbacks_object,
         runner_callbacks    =   callbacks_object,
