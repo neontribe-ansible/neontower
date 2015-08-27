@@ -3,7 +3,7 @@
     var form = document.getElementById('playbook-form');
     var log = document.getElementById('playbook-log');
 
-    var logger = new Logger(log, 4);
+    var logger = new Logger(log, { rows: 4, scroll: true });
 
     form.addEventListener('submit', function (event) {
       event.preventDefault();

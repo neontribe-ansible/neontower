@@ -1,6 +1,7 @@
 (function (global) {
-  function Logger(logElement, rows) {
-    this.rows = rows || 3;
+  function Logger(logElement, options) {
+    this.rows = options.rows || 3;
+    this.scroll = options.scroll || false;
     this.logElement = logElement;
   }
 
@@ -24,6 +25,36 @@
       rowElement.classList.add('level-' + level.toLowerCase())
     }
 
+    var atBottom = isScrolledToBottom();
+
     this.logElement.appendChild(rowElement);
+
+    if (this.scroll && atBottom) {
+      scrollToBottom();
+    }
+  }
+
+  function isScrolledToBottom() {
+    // the y-coordinate of the lowest pixel shown from the document on screen
+    // at present
+    var lowerShown = window.scrollY + window.innerHeight;
+
+    // cross-browser compatibility for document height (crazy, right)
+    var potentialDocumentHeights = [
+      document.body.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.clientHeight,
+      document.documentElement.scrollHeight,
+      document.documentElement.offsetHeight
+    ];
+
+    // if lowerShown matches any of the numbers, it is likely that the user is
+    // indeed scrolled to the bottom of the page
+    return potentialDocumentHeights.indexOf(lowerShown) !== -1;
+  }
+
+  function scrollToBottom() {
+    // TODO: consider smooth scrolling
+    window.scrollTo(0, document.body.scrollHeight);
   }
 })(window)
