@@ -4,6 +4,7 @@ Useful utility functions for loading configuration files.
 
 import os
 import json
+import errno
 
 CREATED_CACHE_EXTENSION = '.json'
 CREATED_CONFIG_EXTENSION = '.json'
@@ -69,6 +70,11 @@ def load_cache(path, default, refresh=False):
 
     # cache the value
     try:
+        # make sure the directory the file will be created in exists
+        parent_dir = os.path.sep.join(path.split(os.path.sep)[:-1]) # removes last part of path
+        mkdir_p(parent_dir)
+
+        # attempt to write the cache file
         with open(path, 'w') as cache_file:
             raw = json.dumps({ 'data': value })
             cache_file.write(raw)
@@ -78,6 +84,26 @@ def load_cache(path, default, refresh=False):
         pass
 
     return value
+
+
+def mkdir_p(path):
+    '''Attempts to make directories, assuming that if they already exist then
+    there is no issue, there was just no need to attempt to create them again in
+    the first place.
+
+    Based on the Unix command 'mkdir -p', follows EAFP.
+
+    Credit: http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python#600612
+    '''
+    try:
+        os.makedirs(path)
+    except OSError as e:
+        if e.errno == errno.EEXIST and os.path.isdir(path):
+            # the directory already exists, ignore this error
+            pass
+        else:
+            # something bad happened :(
+            raise
 
 
 def get_script_directory():
