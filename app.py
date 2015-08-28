@@ -130,7 +130,7 @@ def run_playbook():
         if not field['name'] in request.args:
             return jsonify(error='Missing required parameter for PlayBook \'' + field['name'] + '\''), HTTP_UNPROCESSABLE_ENTITY
         value = request.args[field['name']]
-        return_types = { 'string': str, 'boolean': bool, 'integer': int }
+        return_types = { 'string': str, 'boolean': str_to_bool, 'integer': int }
         return_type_caster = return_types[field['return_type']]
         try:
             casted = return_type_caster(value)
@@ -227,6 +227,26 @@ def get_filetree():
     else:
         filetree = loader.load_cache(cache_path, default)
     return jsonify(filetree)
+
+
+def str_to_bool(string):
+    '''This is a utility function used for the conversion of strings
+    representing boolean values to their value in the bool type.
+
+    It is case insensitive and will map 'true' to True and 'false' to False. All
+    other values will raise a ValueError.
+
+    This function is needed as the bool() function works quite unlike the int()
+    function: it will see an empty string as the value False and a non-empty
+    sting as the value True. Quite odd.
+    '''
+
+    if string.lower() == 'true':
+        return True
+    elif string.lower() == 'false':
+        return False
+    else:
+        raise ValueError('"' + string + '" represents neither the value True nor False')
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@
     var form = document.getElementById('playbook-form');
     var log = document.getElementById('playbook-log');
 
-    var logger = new Logger(log, 4);
+    var logger = new Logger(log, { rows: 4, scroll: true });
 
     form.addEventListener('submit', function (event) {
       event.preventDefault();
@@ -11,6 +11,8 @@
       var values = extractFormValues(form);
       var url = buildUrl('/run_playbook', values);
       var source = new EventSource(url);
+
+      logger.clear();
 
       source.addEventListener('open', function (event) {
         logger.log([new Date().toLocaleTimeString(), 'Connected']);

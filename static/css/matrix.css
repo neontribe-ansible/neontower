@@ -96,7 +96,7 @@ button.submit
 div.log
 {
   border: 1px #00ff00 dashed;
-  min-height: 5em;
+  height: 1em;
   display: table;
   width: 100%;
 }
@@ -123,6 +123,7 @@ div.log .message:last-child .part
 div.log .message .part:last-child
 {
   border-right: 0;
+  word-break: break-all;
 }
 
 a,a:visited{
