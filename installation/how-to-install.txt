@@ -1,0 +1,47 @@
+.-----.-----.-----.-----.|  |_.-----.--.--.--.-----.----.
+|     |  -__|  _  |     ||   _|  _  |  |  |  |  -__|   _|  
+|__|__|_____|_____|__|__||____|_____|________|_____|__|
+
+1. Install LAMP stack and open SSH server on new machine
+-----------------------------------------------------------
+On startup install choose to install lamp-server and openssh-server
+
+OR
+
+sudo apt-get install tasksel
+sudo tasksel install lamp-server
+sudo tasksel install openssh-server
+
+
+2. Change Inventory file on machine running ansible
+---------------------------------------------------
+
+change ansible_ssh_host and ansible_ssh_user  /neontower/installation/inventory/target-server
+
+3. Run install.yml from machine running ansible
+------------------------------------------------
+
+Run: ansible-playbook install.yml -i inventory/target_server --ask-sudo-pass  from inside the neontower/installation folder and follow the prompts
+
+
+4. Sort the Password config on the new machine.
+-----------------------------------------------
+
+    a) cd ~/neontower/config && ansible-vault create vault.json.aes
+    b) enter vault password
+    c) In the vim type : {"sudo_password": "InsertYourPasswordHere"}
+    d) change vault_password in ansible.json
+
+5. Sort SSH connections for cottage servers.
+--------------------------------------------
+
+    a) cd ~ && mkdir .ssh && touch ~/.ssh/config
+    b) ssh-keygen -t rsa (without passphrase)
+    Repeat each of the following steps for each cottage server:
+    c) ssh-copy-id username@IPofServer
+    d) In ~/.ssh/config add:
+       Host neonzz
+           Hostname IPofServer
+           User userOnServer
+           IdentityFile ~/.ssh/rsa_id.pub
+    

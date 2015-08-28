@@ -1,0 +1,65 @@
+---
+- name: Update apt
+  become: yes
+  become_method: sudo
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: Install everything needed through apt-get
+  become: yes
+  become_method: sudo
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - python2.7
+    - python-pip
+    - python2.7-dev
+    - drush
+    - git
+    - libmysqlclient-dev
+
+- name: Update apt
+  become: yes
+  become_method: sudo
+  shell: pip install {{ item }}
+  with_items:
+    - flask
+    - ansible
+    - pycrypto
+    - GitPython
+    - mysql-python
+
+#- name: Fetch shell tools
+#  sudo: yes
+#  git: dest=/usr/local/share/Shelltools repo=https://github.com/tobybatch/Shell-tools.git
+
+#- name: Install Shell tools
+#  sudo: yes
+#  shell: cd /usr/local/share && sudo git clone https://github.com/tobybatch/Shell-tools.git && cd /usr/local/bin && sudo ln -s /usr/local/share/Shell-tools/* .
+
+#- name: Fetch ntdr-pas
+#  git: dest=~/ntdr-pas repo=https://github.com/neontribe/ntdr-pas.git
+
+- name: Checkout correct Develop branch
+  shell: git -C ~/ntdr-pas checkout develop
+
+#- name: Fetch neontower
+#  git: dest=~/neontower repo=https://github.com/neontribe-ansible/neontower.git
+
+- name: Checkout correct Develop branch of neontower
+  shell: git -C ~/neontower checkout develop
+
+- name: Checkout correct adamtest branch of ntdr-pas
+  shell: git -C ~/ntdr-pas checkout adamtest
+
+#- name: Copy default configs to make configs
+#  shell: for config in ~/neontower/config/*.json*; do cp $config `echo "$config" | sed "s/.default//"`; done
+
+- name: Configuring Config files
+  template: src={{item}}.json.tpl dest=~/neontower/config/{{item}}.json
+  with_items:
+    - ansible
+    #- playbooks
+    - playbooks_config
+    - server
+    - website
+
+
