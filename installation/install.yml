@@ -10,7 +10,7 @@
         local_my_sql_root_password: "thingy"
         host: "0.0.0.0"
         port: 5000
-        theme: "matrix"
+        theme: "standard"
   vars_prompt:
     - name: vault_password
       prompt: Enter the password to be used for securing the remote user's password in ansible vault.

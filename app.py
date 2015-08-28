@@ -28,6 +28,23 @@ playbooks_config = loader.load_config(os.path.sep.join([loader.get_config_direct
 website_config = loader.load_config(os.path.sep.join([loader.get_config_directory(), 'website']))
 
 
+#ansible-playbook pull-full-copy.yml -i inventory/cottage-servers-live --limit=ch_live --extra-vars="source=/var/www/latest local=/var/tmp/ch withdb=true mysql_root_pw=password"
+def construct_playbook_command(playbook_path, inventory_path, limits, sudo_password, extra_vars):
+    spacer = ' '
+    command = 'ansible-playbook' + spacer + playbook_path.split('/')[-1] + spacer
+    command += '-i' + spacer + inventory_path.split('/')[-2] + '/' + inventory_path.split('/')[-1] + spacer
+    command += '--limit' + '=' + limits[0] + spacer
+    extra_vars_string = 'extra_vars="'
+    for i,var in enumerate(extra_vars.keys()):
+        extra_vars_string += var + '=' + extra_vars[var]
+        if i != (len(extra_vars.keys()) - 1):
+            extra_vars_string += spacer
+    extra_vars_string += '"'
+    command += extra_vars_string
+	    
+    return command
+
+
 def get_filetree_info(hostname):
     cache_path = os.path.sep.join([loader.get_cache_directory(), 'filetree'])
     default = fetch_filetree
@@ -172,6 +189,8 @@ def run_playbook():
 
     # check that the client accepts server_side_events
     if request.headers.get('accept') == 'text/event-stream':
+        # For debugging purposes this prints the equivalent command line command 
+        print construct_playbook_command(playbook_path, inventory_path, [ limit ],become_pass, extra_vars)
         def events():
             # yield events as they arrive
             for event in bridge.run_playbook(playbook_path, inventory_path, [ limit ],become_pass, extra_vars):
