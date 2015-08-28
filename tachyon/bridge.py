@@ -178,7 +178,7 @@ def get_host_passwords(inventory_path):
 
     NOTE: the passwords described are the passwords given by the "mysql_root_pw" field in the
           inventory file.
- 
+
     Parameters:
     * inventory_path    str     The path of the inventory file to read hosts
                                 from.
@@ -212,4 +212,3 @@ def load_vault_yaml(path, password):
       secret_config = bridge.load_vault_yaml('/home/harryd/neontower/config/super_secret.json.aes', 'hunter2')
     '''
     return parse_yaml_from_file(path, password)
-

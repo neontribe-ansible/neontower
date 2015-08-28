@@ -24,6 +24,9 @@ def load_config(path):
             data = json.loads(raw)
             return data
     except IOError as e:
+        # TODO: check if the file does not exist or if there is a more severe
+        #       error
+        
         # the file did not exist, or could not be read
         # we will proceed to attempt to read the default
         pass

@@ -115,6 +115,14 @@ def run_playbook():
         return jsonify(error='The \'name\' parameter is required'), HTTP_UNPROCESSABLE_ENTITY
     name = request.args['name']
 
+    # check that the provided server both exists and is valid
+    if not 'host' in request.args:
+        return jsonify(error='The \'host\' parameter is required'), HTTP_UNPROCESSABLE_ENTITY
+    potential_hosts = bridge.get_host_names(ansible_config['inventory_path'])
+    limit = request.args['host']
+    if not limit in potential_hosts:
+        return jsonify(error='The host \'' + limit + '\' is not known'), HTTP_UNPROCESSABLE_ENTITY
+
     # find the PlayBook schema by the provided name
     playbook_schema = None
     for potential_schema in playbooks_schemas['playbooks']:
@@ -127,6 +135,7 @@ def run_playbook():
     # parse parameters to populate extra_vars
     extra_vars = {}
     for field in playbook_schema['fields']:
+        # TODO: check for clashes
         if not field['name'] in request.args:
             return jsonify(error='Missing required parameter for PlayBook \'' + field['name'] + '\''), HTTP_UNPROCESSABLE_ENTITY
         value = request.args[field['name']]
@@ -142,13 +151,16 @@ def run_playbook():
     for config_object in playbook_schema['config_nodes']:
         extra_vars[config_object['arg_name']] = playbooks_config[config_object['node']]
 
+    helper_functions = {}
+    helper_functions['get_filetree_info'] = get_filetree_info
+    helper_functions['get_remote_passwords'] = get_remote_passwords
+
     # add PlayBook's constants
     for constant_object in playbook_schema['constants']:
         # if the constant is a dictionary it indicates that a helper function is going
         # to be used, therefore extra work is needed
         if type(constant_object['value']) is dict:
-            # TODO: kill eval with fire
-            extra_vars[constant_object['arg_name']] = eval(constant_object['value']['helper_function'] + '("' + request.args['host'] + '")')
+            extra_vars[constant_object['arg_name']] = helper_functions[constant_object['value']['helper_function']](request.args['host'])
         else:
             extra_vars[constant_object['arg_name']] = constant_object['value']
 
@@ -161,14 +173,6 @@ def run_playbook():
     # work out the values to call tachyon with
     playbook_path = os.path.sep.join([ansible_config['ntdr_pas_path'], 'playbooks', playbook_schema['yaml']])
     inventory_path = ansible_config['inventory_path']
-
-    # check that the provided server both exists and is valid
-    if not 'host' in request.args:
-        return jsonify(error='The \'host\' parameter is required'), HTTP_UNPROCESSABLE_ENTITY
-    potential_hosts = bridge.get_host_names(ansible_config['inventory_path'])
-    limit = request.args['host']
-    if not limit in potential_hosts:
-        return jsonify(error='The host \'' + limit + '\' is not known'), HTTP_UNPROCESSABLE_ENTITY
 
     # check that the client accepts server_side_events
     if request.headers.get('accept') == 'text/event-stream':
