@@ -1,2 +1,2 @@
 [this]
-test1  ansible_ssh_host=192.168.21.139 ansible_ssh_user=adam
+test1  ansible_ssh_host=192.168.21.111 ansible_ssh_user=adam

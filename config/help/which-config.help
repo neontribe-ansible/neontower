@@ -8,6 +8,8 @@ inventor_path: Path to the inventory file in the ntdr_pas folder.
 
 remote_site_root: The Path that should be looked in for sites on any remote machine.
 
+vault_password: The password to unlock the ansible vault which stores the user's sudo password
+
 
 #############################
 ### playbooks_config.json ###
@@ -39,4 +41,9 @@ theme: The colour scheme and layout of the website. Themes include (standard/fla
 
 This is your last chance. After this, there is no turning back. You take the blue pill—the story ends, you wake up in your bed and believe whatever you want to believe. You take the red pill—you stay in Wonderland, and I show you how deep the rabbit hole goes. Remember: all I'm offering is the truth. Nothing more.
 
+######################
+### vault.json.aes ###
+######################
+THIS FILE IS ENCRYPTED
 
+sudo_password: The sudo password for the user, used in the ansible scripts
