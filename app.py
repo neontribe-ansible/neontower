@@ -34,7 +34,8 @@ def construct_playbook_command(playbook_path, inventory_path, limits, sudo_passw
     command = 'ansible-playbook' + spacer + playbook_path.split('/')[-1] + spacer
     command += '-i' + spacer + inventory_path.split('/')[-2] + '/' + inventory_path.split('/')[-1] + spacer
     command += '--limit' + '=' + limits[0] + spacer
-    extra_vars_string = 'extra_vars="'
+    command += '--ask-sudo-pass' + spacer 
+    extra_vars_string = '--extra-vars="'
     for i,var in enumerate(extra_vars.keys()):
         extra_vars_string += var + '=' + extra_vars[var]
         if i != (len(extra_vars.keys()) - 1):
