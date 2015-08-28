@@ -1,0 +1,25 @@
+---
+- hosts: all
+  vars:
+      # Any path should be from the ~. So ntdr-pas which is at ~/ntdr-pas should be /ntdr-pas etc
+      neontower:
+        ntdr_pas_path: "/ntdr-pas"
+        inventory_path: "/ntdr-pas/playbooks/inventory/cottage-servers"
+        remote_site_root: "/var/www"
+        vault_password: "hogwarts"
+        local_my_sql_root_password: "thingy"
+        host: "0.0.0.0"
+        port: 5000
+        theme: "standard"
+  vars_prompt:
+    - name: vault_password
+      prompt: Enter the password to be used for securing the remote user's password in ansible vault.
+      private: true
+      when: vault_passphrase is not defined
+    - name: local_my_sql_root_password
+      prompt: Enter the password password for mySQL on the remote machine.
+      private: true
+      when: local_my_sql_root is not defined
+
+  roles:
+      - neontower-install
