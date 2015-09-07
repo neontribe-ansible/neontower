@@ -37,13 +37,32 @@ def construct_playbook_command(playbook_path, inventory_path, limits, sudo_passw
     command += '--ask-sudo-pass' + spacer 
     extra_vars_string = '--extra-vars="'
     for i,var in enumerate(extra_vars.keys()):
-        extra_vars_string += var + '=' + extra_vars[var]
+	if type(extra_vars[var]) is not bool:
+            extra_vars_string += var + '=' + extra_vars[var]
+	
+        elif extra_vars[var] == True:
+            extra_vars_string += var + '=' + 'true'
+
+        elif extra_vars[var] == True:
+            extra_vars_string += var + '=' + 'false'
+
         if i != (len(extra_vars.keys()) - 1):
             extra_vars_string += spacer
     extra_vars_string += '"'
     command += extra_vars_string
 	    
     return command
+
+def print_playbook_command(command):
+    print '#####################################################'
+    print '# Command to Run current Playbook from command line #'
+    print '#####################################################'
+    print '\n \n'
+    print command
+    print '\n\n'
+    print '#####################################################'
+
+    
 
 
 def get_filetree_info(hostname):
@@ -195,7 +214,7 @@ def run_playbook():
     # check that the client accepts server_side_events
     if request.headers.get('accept') == 'text/event-stream':
         # For debugging purposes this prints the equivalent command line command 
-        print construct_playbook_command(playbook_path, inventory_path, [ limit ],become_pass, extra_vars)
+        print_playbook_command(construct_playbook_command(playbook_path, inventory_path, [ limit ],become_pass, extra_vars))
         def events():
             # yield events as they arrive
             for event in bridge.run_playbook(playbook_path, inventory_path, [ limit ],become_pass, extra_vars):
