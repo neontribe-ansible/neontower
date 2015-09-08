@@ -12,12 +12,14 @@ Key: Fieldname (input types allowed) [list of allowed values if applicable]  Des
 |	|	  |- label: (string) The label that the website displays next the field.
 |	|	  |- return_type: (string) [string/boolean/integer] The type that the server should expect.
 |	|	  |- value: (string/array/boolean) If value is string or boolean it is the default value for the field, if value
-|	|	  			is a list then it denotes the options for the dropdown.
+|	|	  |			is a list then it denotes the options for the dropdown.
+|	|	  |- group: (string) If the variable is in group then put group name here
 |	|
 |	|- config_nodes: (array) The list of parameters which should be pull from playbooksConfig.json.
 |	|	  |
 |	|	  |- arg_name: (string) The name of the parameter that needs to be passed into "extra_vars" when used in a playbook.
 |	|	  |- node: (string) The node of the node in playbooksConfig.json where the info should be pulled from.
+|	|	  |- group: (string) If the variable is in group then put group name here
 |	|
 |	|- constants: (array) The list of parameters which remain constant, don't need user input and aren't pull from config.
 |	|	  |
@@ -26,4 +28,6 @@ Key: Fieldname (input types allowed) [list of allowed values if applicable]  Des
 |	|	  |	  |		dictionary it requires a helper function to get the value.
 |	|	  |	  |
 |	|	  |   |- helper_function: (string) [must be the name of a helper function in the python] The helper function that takes
-|	|	  |   | 				 the host as its only argument and returns the value desired.
+|	|	  |   | 		  the host as its only argument and returns the value desired.
+|	|	  |- group: (string) If the variable is in group then put group name here 
+
