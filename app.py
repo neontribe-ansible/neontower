@@ -224,7 +224,7 @@ def run_playbook():
     become_pass = sensitive_data['sudo_password']
 
     # work out the values to call tachyon with
-    playbook_path = os.path.sep.join([ansible_config['ntdr_pas_path'], 'playbooks', playbook_schema['yaml']])
+    playbook_path = os.path.sep.join([ansible_config['ansible_root_path'], playbook_schema['yaml']])
     inventory_path = ansible_config['inventory_path']
 
     # check that the client accepts server_side_events
@@ -253,7 +253,7 @@ def fetch_filetree():
     become_pass = sensitive_data['sudo_password']
 
     event_generator = bridge.run_task(
-        os.path.sep.join([ ansible_config['ntdr_pas_path'], 'playbooks', 'library', 'ntdr_get_filetree.py' ]),
+        os.path.sep.join([ ansible_config['ansible_root_path'], 'library', 'ntdr_get_filetree.py' ]),
         ansible_config['inventory_path'],
         server_codes,
 	become_pass,

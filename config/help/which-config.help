@@ -2,7 +2,7 @@
 ### ansible.json ###
 ####################
 
-ntdr_pas_path: Path to ntdr_pas folder that contains a playbooks folder with all playbooks in it.
+ansible_root_path: Path to ansible root folder that contains a playbooks folder with all playbooks in it.
 
 inventor_path: Path to the inventory file in the ntdr_pas folder.
 
