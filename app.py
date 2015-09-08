@@ -27,32 +27,19 @@ playbooks_schemas = loader.load_config(os.path.sep.join([loader.get_config_direc
 playbooks_config = loader.load_config(os.path.sep.join([loader.get_config_directory(), 'playbooks_config']))
 website_config = loader.load_config(os.path.sep.join([loader.get_config_directory(), 'website']))
 
-
-#ansible-playbook pull-full-copy.yml -i inventory/cottage-servers-live --limit=ch_live --extra-vars="source=/var/www/latest local=/var/tmp/ch withdb=true mysql_root_pw=password"
+#This functions makes a command which can be run from the command line that will perform the same function as the one that has just been run by Neontower
 def construct_playbook_command(playbook_path, inventory_path, limits, sudo_password, extra_vars):
     spacer = ' '
     command = 'ansible-playbook' + spacer + playbook_path.split('/')[-1] + spacer
     command += '-i' + spacer + inventory_path.split('/')[-2] + '/' + inventory_path.split('/')[-1] + spacer
     command += '--limit' + '=' + limits[0] + spacer
     command += '--ask-sudo-pass' + spacer 
-    extra_vars_string = '--extra-vars="'
-    for i,var in enumerate(extra_vars.keys()):
-	if type(extra_vars[var]) is not bool:
-            extra_vars_string += var + '=' + extra_vars[var]
-	
-        elif extra_vars[var] == True:
-            extra_vars_string += var + '=' + 'true'
-
-        elif extra_vars[var] == True:
-            extra_vars_string += var + '=' + 'false'
-
-        if i != (len(extra_vars.keys()) - 1):
-            extra_vars_string += spacer
-    extra_vars_string += '"'
+    extra_vars_string = "--extra-vars='" + json.dumps(extra_vars, separators=(',',':')) + "'"
     command += extra_vars_string
 	    
     return command
 
+#Function takes the above function and displays it in a more visually obvious way
 def print_playbook_command(command):
     print '#####################################################'
     print '# Command to Run current Playbook from command line #'
@@ -181,12 +168,30 @@ def run_playbook():
         try:
             casted = return_type_caster(value)
         except ValueError as e:
-            return jsonify(error='\'' + value + '\' is not a valid \'' + field['return_type'] + '\''), HTTP_UNPROCESSABLE_ENTITY
-        extra_vars[field['name']] = casted
+            return jsonify(error='\'' + value + '\' is not a valid \'' + field['return_type'] + '\''), HTTP_UNPROCESSABLE_ENTITY	
+        if field['group'] == None:
+            extra_vars[field['name']] = casted
+	elif field['group'] not in extra_vars:
+            extra_vars[field['group']] = {}
+            extra_vars[field['group']][field['name']] = casted
+	else:
+            extra_vars[field['group']][field['name']] = casted
+	
+
+	
 
     # add PlayBook's configurable variables
     for config_object in playbook_schema['config_nodes']:
-        extra_vars[config_object['arg_name']] = playbooks_config[config_object['node']]
+        if config_object['group'] == None:
+            extra_vars[config_object['arg_name']] = playbooks_config[config_object['node']]
+
+	elif config_object['group'] not in extra_vars:
+            extra_vars[config_object['group']] = {}
+            extra_vars[config_object['group']][config_object['arg_name']] =  playbooks_config[config_object['node']]
+
+	else:
+            extra_vars[config_object['group']][config_object['arg_name']] =  playbooks_config[config_object['node']]
+
 
     helper_functions = {}
     helper_functions['get_filetree_info'] = get_filetree_info
@@ -197,9 +202,20 @@ def run_playbook():
         # if the constant is a dictionary it indicates that a helper function is going
         # to be used, therefore extra work is needed
         if type(constant_object['value']) is dict:
-            extra_vars[constant_object['arg_name']] = helper_functions[constant_object['value']['helper_function']](request.args['host'])
+            value = helper_functions[constant_object['value']['helper_function']](request.args['host'])
         else:
-            extra_vars[constant_object['arg_name']] = constant_object['value']
+            value = constant_object['value']
+
+        if constant_object['group'] == None:
+            extra_vars[constant_object['arg_name']] = value
+	elif field['group'] not in extra_vars:
+            extra_vars[constant_object['group']] = {}
+            extra_vars[constant_object['group']][constant_object['arg_name']] = value
+	else:
+            extra_vars[constant_object['group']][constant_object['arg_name']] = value
+	
+
+	
 
     # loading the sensitive data in the ansible vault. It's a json file encrypted with ansible vault. Json is a subset of yaml.
     sensitive_data = bridge.load_vault_yaml(os.path.sep.join([loader.get_config_directory(), 'vault.json.aes']), ansible_config['vault_password'])

@@ -9,28 +9,35 @@
 					"name": "target",
 					"label": "Path of new folder to upload site to",
 					"return_type": "string",
-					"value": "/var/www/zz_0.3"
+					"value": "/var/www/zz_0.3",
+					"group":null
 
 				},
 				{
 					"name": "source",
 					"label": "Path to local folder to upload",
 					"return_type": "string",
-					"value": "/home/tobias/workspace/Cottaging/sites/zz"
+					"value": "/home/tobias/workspace/Cottaging/sites/zz",
+					"group":null
+
 				}
 			],
 			"config_nodes": [],
 			"constants": [
 				{
 					"arg_name": "withdb",
-					"value": true
+					"value": true,
+					"group":null
+
 				},
 				{
 					"arg_name": "mysql_root_pw",
 					"value":
 					{
 						"helper_function": "get_remote_passwords"
-					}
+					},
+					"group":null
+
 				}
 			]
 		},
@@ -45,19 +52,25 @@
 					"return_type": "string",
 					"value": {
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				},
 				{
 					"name": "source",
 					"label": "Path to local folder to freshen from",
 					"return_type": "string",
-					"value": "/home/tobias/workspace/Cottaging/sites/zz"
+					"value": "/home/tobias/workspace/Cottaging/sites/zz",
+					"group":null
+
 				}
 			],
 			"config_nodes": [
 				{
 					"arg_name": "mysql_root_pw",
-					"node": "local_my_sql_root_password"
+					"node": "local_my_sql_root_password",
+					"group":null
+
 				}
 
 			],
@@ -75,25 +88,33 @@
 					"return_type": "string",
 					"value": {
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				},
 				{
 					"name": "local",
 					"label": "Path to destination for pulled files",
 					"return_type": "string",
-					"value": "/var/tmp"
+					"value": "/var/tmp",
+					"group":null
+
 				}
 			],
 			"config_nodes": [
 				{
 					"arg_name": "mysql_root_pw",
-					"node": "local_my_sql_root_password"
+					"node": "local_my_sql_root_password",
+					"group":null
+
 				}
 			],
 			"constants": [
 				{
 					"arg_name": "withdb",
-					"value": true
+					"value": true,
+					"group":null
+
 				}
 			]
 
@@ -109,19 +130,25 @@
 					"return_type": "string",
 					"value": {
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				},
 				{
 					"name": "local",
 					"label": "Path to destination for pulled files",
 					"return_type": "string",
-					"value": "/var/tmp"
+					"value": "/var/tmp",
+					"group":null
+
 				}
 			],
 			"config_nodes": [
 				{
 					"arg_name": "mysql_root_pw",
-					"node": "local_my_sql_root_password"
+					"node": "local_my_sql_root_password",
+					"group":null
+
 				}
 			],
 			"constants": []
@@ -138,25 +165,33 @@
 					"value":
 					{
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				},
 				{
 					"name": "local",
 					"label": "Path to local file to freshen",
 					"return_type": "string",
-					"value": "/var/tmp/zz_0.1"
+					"value": "/var/tmp/zz_0.1",
+					"group":null
+
 				}
 			],
 			"config_nodes": [
 				{
 					"arg_name": "mysql_root_pw",
-					"node": "local_my_sql_root_password"
+					"node": "local_my_sql_root_password",
+					"group":null
+
 				}
 			],
 			"constants": [
 				{
 					"arg_name": "withdb",
-					"value": true
+					"value": true,
+					"group":null
+
 				}
 			]
 
@@ -174,21 +209,27 @@
 					"value":
 					{
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				},
 
 				{
 					"name": "local",
 					"label": "Path to local file to freshen",
 					"return_type": "string",
-					"value": "/var/tmp/zz_0.1"
+					"value": "/var/tmp/zz_0.1",
+					"group":null
+
 				}
 
 			],
 			"config_nodes": [
 				{
 					"arg_name": "mysql_root_pw",
-					"node": "local_my_sql_root_password"
+					"node": "local_my_sql_root_password",
+					"group":null
+
 				}
 			],
 			"constants": []
@@ -202,7 +243,9 @@
 					"name": "target",
 					"label": "Path to new remote RC folder",
 					"return_type": "string",
-					"value": "/var/www/zz_0_1"
+					"value": "/var/www/zz_0_1",
+					"group":null
+
 				},
 				{
 					"name": "source",
@@ -210,7 +253,9 @@
 					"return_type": "string",
 					"value": {
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				}
 
 			],
@@ -220,7 +265,9 @@
 					"arg_name": "mysql_root_pw",
 					"value": {
 						"helper_function": "get_remote_passwords"
-					}
+					},
+					"group":null
+
 				}
 			]
 
@@ -236,7 +283,9 @@
 					"return_type": "string",
 					"value": {
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 
 				},
 				{
@@ -245,7 +294,9 @@
 					"return_type": "string",
 					"value": {
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				}
 
 			],
@@ -263,7 +314,9 @@
 					"return_type": "string",
 					"value": {
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				},
 				{
 					"name": "testing",
@@ -271,13 +324,16 @@
 					"return_type": "string",
 					"value": {
 						"helper_function": "get_filetree_info"
-					}
+					},
+					"group":null
+
 				},
 				{
 					"name": "newrc",
 					"label": "Path of new remote release candidate folder",
 					"return_type": "string",
-					"value": "/var/www/zz_0.3"
+					"value": "/var/www/zz_0.3",
+					"group":null
 				}
 			],
 			"config_nodes": [],
