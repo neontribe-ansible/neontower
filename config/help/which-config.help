@@ -2,7 +2,7 @@
 ### ansible.json ###
 ####################
 
-ansible_root_path: Path to ansible root folder that contains a playbooks folder with all playbooks in it.
+ansible_root_path: Path to ansible root folder that contains the playbook yaml files and directories such as roles and inventory.
 
 inventor_path: Path to the inventory file in the ntdr_pas folder.
 
